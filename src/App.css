@@ -1,0 +1,45 @@
+:root {
+  /* Primary warm colors */
+  --primary-orange: #ff8c42;
+  --primary-yellow: #ffd23f;
+  --accent-warm: #ff6b35;
+  
+  /* Shades and tints */
+  --orange-light: #ffb380;
+  --orange-dark: #e67e22;
+  --yellow-light: #ffe066;
+  --yellow-dark: #f39c12;
+  
+  /* Neutral warm colors */
+  --warm-white: #fefcf7;
+  --warm-bg: #fdf9f0;
+  --warm-gray: #8d7053;
+  --warm-black: #3c2e26;
+  
+  /* Semantic colors */
+  --success: #27ae60;
+  --warning: var(--primary-yellow);
+  --error: #e74c3c;
+  
+  /* Shadows with warm tint */
+  --shadow-warm: rgba(255, 140, 66, 0.2);
+  --shadow-light: rgba(255, 140, 66, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background-color: var(--warm-bg);
+  color: var(--warm-black);
+  line-height: 1.6;
+}
+
+.App {
+  min-height: 100vh;
+  position: relative;
+}
