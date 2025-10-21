@@ -4,7 +4,7 @@ import './DishList.css';
 const DishList = ({ dishes }) => {
     return (
         <section className="dish-list">
-            {dishes.map((dish) => <DishCard dish={dish}/>)}
+            {dishes.map((dish) => <DishCard key={dish.id} dish={dish}/>)}
         </section>
     );
 }

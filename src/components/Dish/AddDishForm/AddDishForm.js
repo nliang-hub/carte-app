@@ -1,136 +1,188 @@
 import './AddDishForm.css';
-import { useState } from 'react';
+import { useImmer } from 'use-immer';
 
-const AddDishForm = ({ onClose }) => {
-    const [image, setImage] = useState(null);
+const AddDishForm = ({ onSubmit, onClose }) => {
+  const [formData, updateFormData] = useImmer({
+    image: null,
+    imageUrl: null,
+    dishName: '',
+    description: '',
+    category: ''
+  });
 
-    const closeButtonClick = (e) => {
-        e.stopPropagation();
-        onClose();
+  const handleCloseClick = (e) => {
+    e.stopPropagation();
+    onClose();
+  };
+
+  const handleImageClick = () => {
+    document.getElementById('image-upload').click();
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64String = event.target.result;
+        updateFormData(draft => {
+          draft.image = file;
+          draft.imageUrl = base64String;
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleInputChange = (field) => (e) => {
+    updateFormData(draft => {
+      draft[field] = e.target.value;
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!formData.image) {
+      alert('Please upload an image for your new dish');
+      return;
     }
 
-    const handleImageClick = () => {
-        document.getElementById('image-upload').click();
-    }
+    const newDish = {
+      dishName: formData.dishName,
+      description: formData.description,
+      category: formData.category,
+      imageUrl: formData.imageUrl
+    };
 
-    const handleImageUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setImage(file);
-        }
-    }
+    onSubmit(newDish);
+    onClose();
+  };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (image) {
-            const formData = new FormData(e.target);
-            const dishName = formData.get('dishName');
-            const description = formData.get('dishDescription');
-            const category = formData.get('category');
-            formData.append('dishImage', image);
-            console.log('Form submitted:', {
-                dishName,
-                description,
-                category,
-                image: image.name
-            });
-            onClose();
-        } else {
-            alert('Please upload an image for your new dish');
-            return;
-        }
-    }
-    
-    return (
-        <div className="modal-overlay">
-            <form onSubmit={handleSubmit}>
-                <div className="modal-container">
-                    <div className='modal-header' onClick={handleImageClick}>
-                        <div>
-                            {image ? <img id='dish-picture' src={URL.createObjectURL(image)} alt='Dish Preview'/> : <div className='picture-placeholder'>📷 Upload Dish Picture</div>}
-                            <input 
-                                id='image-upload' 
-                                className='hidden' 
-                                type='file' 
-                                accept='image/*'
-                                onChange={handleImageUpload}
-                                required
-                            />
-                        </div>
-                        <button className='close-button' onClick={closeButtonClick} >✗</button>
-                    </div>
-                    <div className='modal-body'>
-                        <input 
-                            className='dish-name' 
-                            name='dishName'
-                            type='text'
-                            required 
-                            placeholder='Dish Name'/>
-                        <textarea 
-                            className='dish-description' 
-                            name='dishDescription'
-                            placeholder='Dish Description (optional)'
-                            maxLength='150'
-                            rows='3'
-                        />
-                        <div className='category-selection'>
-                            <label>
-                                <input
-                                    type='radio'
-                                    name='category'
-                                    value='appetizer'
-                                    required
-                                />
-                                🥗 Appetizer
-                            </label>
-                            <label>
-                                <input
-                                    type='radio'
-                                    name='category'
-                                    value='main'
-                                />
-                                🍖 Main Course
-                            </label>
-                            <label>
-                                <input
-                                    type='radio'
-                                    name='category'
-                                    value='pasta'
-                                />
-                                🍝 Pasta
-                            </label>
-                            <label>
-                                <input
-                                    type='radio'
-                                    name='category'
-                                    value='seafood'
-                                />
-                                🐟 Seafood
-                            </label>
-                            <label>
-                                <input
-                                    type='radio'
-                                    name='category'
-                                    value='vegetarian'
-                                />
-                                🥕 Vegetarian
-                            </label>
-                            <label>
-                                <input
-                                    type='radio'
-                                    name='category'
-                                    value='dessert'
-                                />
-                                🍰 Dessert
-                            </label>
-                        </div>
-                    </div>
+  return (
+    <div className="modal-overlay">
+      <form onSubmit={handleSubmit}>
+        <div className="modal-container">
+          <div className="modal-header" onClick={handleImageClick}>
+            <div>
+              {formData.imageUrl ? (
+                <img
+                  id="dish-picture"
+                  src={formData.imageUrl}
+                  alt="Dish Preview"
+                />
+              ) : (
+                <div className="picture-placeholder">
+                  📷 Upload Dish Picture
                 </div>
-                <button class='submit-button'>✓</button>
-            </form>
+              )}
+              <input
+                id="image-upload"
+                className="hidden"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                required
+              />
+            </div>
+            <button
+              className="close-button"
+              onClick={handleCloseClick}
+            >
+              ✗
+            </button>
+          </div>
+          <div className="modal-body">
+            <input
+              className="dish-name"
+              name="dishName"
+              type="text"
+              value={formData.dishName}
+              onChange={handleInputChange('dishName')}
+              required
+              placeholder="Dish Name"
+            />
+            <textarea
+              className="dish-description"
+              name="dishDescription"
+              value={formData.description}
+              onChange={handleInputChange('description')}
+              placeholder="Dish Description (optional)"
+              maxLength="150"
+              rows="3"
+            />
+            <div className="category-selection">
+              <label>
+                <input
+                  type="radio"
+                  name="category"
+                  value="appetizer"
+                  checked={formData.category === 'appetizer'}
+                  onChange={handleInputChange('category')}
+                  required
+                />
+                🥗 Appetizer
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="category"
+                  value="main"
+                  checked={formData.category === 'main'}
+                  onChange={handleInputChange('category')}
+                />
+                🍖 Main Course
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="category"
+                  value="pasta"
+                  checked={formData.category === 'pasta'}
+                  onChange={handleInputChange('category')}
+                />
+                🍝 Pasta
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="category"
+                  value="seafood"
+                  checked={formData.category === 'seafood'}
+                  onChange={handleInputChange('category')}
+                />
+                🐟 Seafood
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="category"
+                  value="vegetarian"
+                  checked={formData.category === 'vegetarian'}
+                  onChange={handleInputChange('category')}
+                />
+                🥕 Vegetarian
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="category"
+                  value="dessert"
+                  checked={formData.category === 'dessert'}
+                  onChange={handleInputChange('category')}
+                />
+                🍰 Dessert
+              </label>
+            </div>
+          </div>
         </div>
-    );
-}
+        <button className="submit-button" type="submit">
+          ✓
+        </button>
+      </form>
+    </div>
+  );
+};
 
 export default AddDishForm;
 
@@ -152,17 +204,17 @@ const handleInputChange = (e) => {
 const handleSubmit = (e) => {
   e.preventDefault();
   const submitData = new FormData();
-  
+
   // Add form fields
   submitData.append('dishName', formData.dishName);
   submitData.append('description', formData.description);
   submitData.append('category', formData.category);
-  
+
   // Add file if selected
   if (selectedFile) {
     submitData.append('dishImage', selectedFile);
   }
-  
+
   // Submit to API or parent component
   console.log('Submitting:', submitData);
   onAddDish(submitData);
