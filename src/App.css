@@ -3,6 +3,11 @@
   --primary-orange: #ff8c42;
   --primary-yellow: #ffd23f;
   --accent-warm: #ff6b35;
+
+  /* Alert colors*/
+  --danger-red: #ff4757;
+  --danger-red-dark: #ff3838;
+  --shadow-danger: rgba(255, 71, 87, 0.3);
   
   /* Shades and tints */
   --orange-light: #ffb380;
