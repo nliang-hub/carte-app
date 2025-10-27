@@ -1,53 +1,53 @@
-import { useState, useEffect } from 'react';
-import './App.css';
-import DishList from './components/Dish/DishList';
-import AddDishButton from './components/Dish/AddDishButton';
-import AddDishForm from './components/Dish/AddDishForm';
-import DishModal from './components/Dish/DishModal';
+import { useState, useEffect } from "react";
+import "./App.css";
+import DishList from "./components/Dish/DishList";
+import AddDishButton from "./components/Dish/AddDishButton";
+import AddDishForm from "./components/Dish/AddDishForm";
+import DishModal from "./components/Dish/DishModal";
 
 function App() {
   const [dishes, setDishes] = useState(() => {
-    const saved = localStorage.getItem('dishes');
+    const saved = localStorage.getItem("dishes");
     return saved
       ? JSON.parse(saved)
       : [
           {
             id: 1,
-            dishName: 'Grilled Asparagus',
+            dishName: "Grilled Asparagus",
             description:
-              'Fresh asparagus spears grilled to perfection with olive oil and seasonings',
-            category: 'vegetarian',
-            imageUrl: '/images/dishes/asparagus.jpeg',
+              "Fresh asparagus spears grilled to perfection with olive oil and seasonings",
+            category: "vegetarian",
+            imageUrl: "/images/dishes/asparagus.jpeg",
           },
           {
             id: 2,
-            dishName: 'Kung Pao Chicken',
+            dishName: "Kung Pao Chicken",
             description:
-              'Spicy Sichuan dish with tender chicken, peanuts, and dried chilies in savory sauce',
-            category: 'main',
-            imageUrl: '/images/dishes/kung-pao-chicken.webp',
+              "Spicy Sichuan dish with tender chicken, peanuts, and dried chilies in savory sauce",
+            category: "main",
+            imageUrl: "/images/dishes/kung-pao-chicken.webp",
           },
           {
             id: 3,
-            dishName: 'Classic Pasta',
-            description: 'Traditional Italian pasta with rich tomato sauce and fresh herbs',
-            category: 'pasta',
-            imageUrl: '/images/dishes/pasta.jpg',
+            dishName: "Classic Pasta",
+            description: "Traditional Italian pasta with rich tomato sauce and fresh herbs",
+            category: "pasta",
+            imageUrl: "/images/dishes/pasta.jpg",
           },
           {
             id: 4,
-            dishName: 'Hawaiian Poke Bowl',
+            dishName: "Hawaiian Poke Bowl",
             description:
-              'Fresh cubed fish served over rice with vegetables and traditional seasonings',
-            category: 'seafood',
-            imageUrl: '/images/dishes/poke.webp',
+              "Fresh cubed fish served over rice with vegetables and traditional seasonings",
+            category: "seafood",
+            imageUrl: "/images/dishes/poke.webp",
           },
           {
             id: 5,
-            dishName: 'Street Tacos',
-            description: 'Authentic Mexican tacos with seasoned meat, fresh cilantro, and lime',
-            category: 'main',
-            imageUrl: '/images/dishes/tacos.jpg',
+            dishName: "Street Tacos",
+            description: "Authentic Mexican tacos with seasoned meat, fresh cilantro, and lime",
+            category: "main",
+            imageUrl: "/images/dishes/tacos.jpg",
           },
         ];
   });
@@ -56,7 +56,7 @@ function App() {
   const [selectedDish, setSelectedDish] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem('dishes', JSON.stringify(dishes));
+    localStorage.setItem("dishes", JSON.stringify(dishes));
   }, [dishes]);
 
   const handleAddDish = (newDish) => {
@@ -70,6 +70,16 @@ function App() {
     setDishFormOpen(false);
   };
 
+  const handleEditDish = (editDish) => {
+    setDishes(prev => prev.map(dish => dish.id === editDish.id? editDish : dish));
+    setSelectedDish(null);
+  }
+
+  const handleDeleteDish = (deleteId) => {
+    setDishes(prev => prev.filter((dish) => dish.id !== deleteId));
+    setSelectedDish(null);
+  }
+
   const handleDishClick = (dish) => setSelectedDish(dish);
 
   return (
@@ -82,7 +92,7 @@ function App() {
 
       {!dishFormOpen && <AddDishButton onClick={() => setDishFormOpen(true)} />}
 
-      {selectedDish && <DishModal dish={selectedDish} onClose={() => setSelectedDish(null)}/>}
+      {selectedDish && <DishModal dish={selectedDish} onClose={() => setSelectedDish(null)} handleDelete={handleDeleteDish} onSubmit={handleEditDish}/>}
 
       {dishFormOpen && (
         <AddDishForm onSubmit={handleAddDish} onClose={() => setDishFormOpen(false)} />

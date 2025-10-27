@@ -70,15 +70,16 @@ const DishForm = ({
         }
 
         const newDish = {
+            id: initialData.id,
             dishName: formData.dishName,
             description: formData.description,
             category: formData.category,
             imageUrl: formData.imageUrl,
         };
-
+        
         onSubmit(newDish);
         onClose();
-    }, [formData, requireImage, onSubmit, onClose]);
+    }, [formData, requireImage, onSubmit, onClose, initialData]);
 
     return (
         <div className="modal-overlay" role="dialog" aria-modal="true">

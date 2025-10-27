@@ -60,7 +60,7 @@ const DishModal = ({ dish = {}, onClose, handleDelete, onSubmit }) => {
                         </button>
                         <button
                             className="action-button delete-button"
-                            onClick={handleDelete}
+                            onClick={() => handleDelete(dish.id)}
                             type="button"
                         >
                             🗑️ Delete
