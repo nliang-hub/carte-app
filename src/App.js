@@ -6,11 +6,8 @@ import AddDishForm from "./components/Dish/AddDishForm";
 import DishModal from "./components/Dish/DishModal";
 
 function App() {
-  const [dishes, setDishes] = useState(() => {
-    const saved = localStorage.getItem("dishes");
-    return saved
-      ? JSON.parse(saved)
-      : [
+  const defaultDishes = 
+[
           {
             id: 1,
             dishName: "Grilled Asparagus",
@@ -50,41 +47,75 @@ function App() {
             imageUrl: "/images/dishes/tacos.jpg",
           },
         ];
-  });
-
+  const [dishes, setDishes] = useState(null);
   const [dishFormOpen, setDishFormOpen] = useState(false);
   const [selectedDish, setSelectedDish] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("dishes", JSON.stringify(dishes));
-  }, [dishes]);
+    fetch("/dishes")
+    .then(res => res.json())
+    .then(data => setDishes(data))
+    .catch(err => console.error("Error loading dishes:", err));
+  }, []);
 
-  const handleAddDish = (newDish) => {
-    setDishes((prev) => [
-      ...prev,
-      {
-        ...newDish,
-        id: prev.length + 1,
-      },
-    ]);
-    setDishFormOpen(false);
+  const handleAddDish = async (newDish) => {
+    try {
+      const res = await fetch("/dishes", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(newDish)
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setDishes(prev => [...prev, data]);
+        setDishFormOpen(false);
+      }
+    } catch (err) {
+      console.error("Error adding dish:", err);
+    }
   };
 
-  const handleEditDish = (editDish) => {
-    setDishes(prev => prev.map(dish => dish.id === editDish.id? editDish : dish));
-    setSelectedDish(null);
+  const handleEditDish = async (editDish) => {
+    try {
+      const res = await fetch(`/dishes/${editDish.id}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(editDish)
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setDishes(prev => prev.map(dish => dish.id === data.id? data : dish));
+        setSelectedDish(null);
+      }
+    } catch (err) {
+      console.error("Error editing dish:", err);
+    }
   }
 
-  const handleDeleteDish = (deleteId) => {
-    setDishes(prev => prev.filter((dish) => dish.id !== deleteId));
-    setSelectedDish(null);
+  const handleDeleteDish = async (deleteId) => {
+    try {
+      const res = await fetch(`/dishes/${deleteId}`, {
+        method: "DELETE"
+      });
+
+      if (res.ok) {
+        setDishes(prev => prev.filter((dish) => dish.id !== deleteId));
+        setSelectedDish(null);
+      }
+    } catch (err) {
+      console.error("Error deleting dish:", err);
+    }
   }
 
   const handleDishClick = (dish) => setSelectedDish(dish);
 
   return (
     <div className="App">
-      {dishes && dishes.length > 0 ? (
+      {dishes === null ? (
+        <p>Loading dishes...</p>
+      ) : dishes.length > 0 ? (
         <DishList dishes={dishes} onDishClick={handleDishClick} />
       ) : (
         <p>Add your first dish!</p>
